@@ -1,0 +1,1 @@
+# extraer-calculadora-solar
