@@ -2,7 +2,15 @@ import re
 
 patt = re.compile(r"([ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
 
-def get_dependencies_from_formula(raw, sheet_name):
+def dependencies(node, wb):
+    sheet, n = node.split('!')
+    f = wb[sheet][n].value
+    f = str(f)
+    if not f.startswith('='):
+        return None
+    return dependencies_from_formula(f, sheet)
+
+def dependencies_from_formula(raw, sheet_name):
     matches = get_matches(raw)
     ret = []
     for match in matches:
@@ -14,6 +22,8 @@ def get_dependencies_from_formula(raw, sheet_name):
     return ret
 
 def get_matches(t):
+    #print('get matches', t, t.__class__)
+    #t = str(t)
     done = set()
     ret = []
     i = 0
@@ -37,5 +47,6 @@ def replace(txt):
     #txt = txt.replace("]", '')
     return txt
 
-c = get_dependencies_from_formula("A1:B3 + Hoja300!$Z$1", "Hoja1")
-print(c)
+if __name__ == '__main__':
+    c = dependencies_from_formula("A1:B3 + Hoja300!$Z$1", "Hoja1")
+    print(c)
