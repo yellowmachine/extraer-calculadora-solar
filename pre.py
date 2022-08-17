@@ -23,8 +23,11 @@ def build(nodes, wb):
 wb = load_workbook('Hoja simplificada calculo anual.xlsx')
 graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
 
-print(graph)
+ #print(graph)
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
 x = [(i, formula(i, wb)) for i in x]
-print(x)
+#print(x)
+
+for k in x:
+    print(f';{k[0]};{k[1]}')
