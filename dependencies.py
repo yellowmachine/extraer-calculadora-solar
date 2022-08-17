@@ -1,6 +1,6 @@
 import re
 
-patt = re.compile(r"([ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
+patt = re.compile(r"('?[ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+'?!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
 
 def dependencies(node, wb):
     sheet, n = node.split('!')
@@ -40,7 +40,7 @@ def get_matches(t):
     return ret
 
 def replace(txt):
-    #txt = txt.replace("'", '')
+    txt = txt.replace("'", '')
     txt = txt.replace("$", '')
     #txt = txt.replace(".", '')
     #txt = txt.replace("[", '')

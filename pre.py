@@ -4,6 +4,7 @@ from dependencies import dependencies
 
 def formula(node, wb):
     sheet, n = node.split('!')
+    sheet = sheet.replace("'", '')
     return wb[sheet][n].value
 
 def build(nodes, wb):
