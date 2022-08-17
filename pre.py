@@ -7,13 +7,16 @@ def formula(node, wb):
     sheet = sheet.replace("'", '')
     return wb[sheet][n].value
 
+values_f = {}
+
 def build(nodes, wb):
     ret = {}
 
     while len(nodes) > 0:
         n = nodes.pop(0)
         if n not in ret:
-            deps = dependencies(n, wb)
+            deps, raw, vars = dependencies(n, wb)
+            values_f[n] = (raw, vars)
             if deps is not None:
                 ret[n] = deps
                 nodes.extend(deps)
@@ -23,11 +26,13 @@ def build(nodes, wb):
 wb = load_workbook('Hoja simplificada calculo anual.xlsx')
 graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
 
- #print(graph)
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
-x = [(i, formula(i, wb)) for i in x]
-#print(x)
+print(x)
+resultado = [(k, v) for (k, v) in values_f.items() if v[0] is not None]
+for k in resultado:
+    print(k)
+#x = [(i, formula(i, wb)) for i in x]
 
-for k in x:
-    print(f';{k[0]};{k[1]}')
+#for k in x:
+#    print(f';{k[0]};{k[1]}')

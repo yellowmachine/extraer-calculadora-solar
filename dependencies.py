@@ -1,29 +1,34 @@
 import re
+import string
 
 patt = re.compile(r"('?[ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+'?!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
+vars = string.ascii_letters
 
 def dependencies(node, wb):
     sheet, n = node.split('!')
     f = wb[sheet][n].value
     f = str(f)
     if not f.startswith('='):
-        return None
+        return None, None, None
     return dependencies_from_formula(f, sheet)
 
 def dependencies_from_formula(raw, sheet_name):
     matches = get_matches(raw)
     ret = []
-    for match in matches:
+    vars_ = {}
+
+    for i, match in enumerate(matches):
+        raw = replace(raw).replace(match, vars[i])
+        vars_[vars[i]] = match
         if not '!' in match:
             match = sheet_name + '!' + match
         if ':' in match:
             match = match[:match.index(':')]
         ret.append(match)
-    return ret
+
+    return ret, raw, vars_
 
 def get_matches(t):
-    #print('get matches', t, t.__class__)
-    #t = str(t)
     done = set()
     ret = []
     i = 0
@@ -42,11 +47,4 @@ def get_matches(t):
 def replace(txt):
     txt = txt.replace("'", '')
     txt = txt.replace("$", '')
-    #txt = txt.replace(".", '')
-    #txt = txt.replace("[", '')
-    #txt = txt.replace("]", '')
     return txt
-
-if __name__ == '__main__':
-    c = dependencies_from_formula("A1:B3 + Hoja300!$Z$1", "Hoja1")
-    print(c)
