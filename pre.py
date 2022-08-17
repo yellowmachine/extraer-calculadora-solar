@@ -2,6 +2,10 @@ from openpyxl import load_workbook
 from graphlib import TopologicalSorter
 from dependencies import dependencies
 
+def formula(node, wb):
+    sheet, n = node.split('!')
+    return wb[sheet][n].value
+
 def build(nodes, wb):
     ret = {}
 
@@ -15,7 +19,11 @@ def build(nodes, wb):
 
     return ret
 
-wb = load_workbook('abc.xlsx')
-graph = build(['Hoja1!A2'], wb)
+wb = load_workbook('Hoja simplificada calculo anual.xlsx')
+graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
+
+print(graph)
 ts = TopologicalSorter(graph)
-print(tuple(ts.static_order()))
+x = tuple(ts.static_order())
+x = [(i, formula(i, wb)) for i in x]
+print(x)
