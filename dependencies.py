@@ -9,24 +9,27 @@ def dependencies(node, wb):
     f = wb[sheet][n].value
     f = str(f)
     if not f.startswith('='):
-        return None, None, None
+        return None, f, None, None
     return dependencies_from_formula(f, sheet)
 
 def dependencies_from_formula(raw, sheet_name):
     matches = get_matches(raw)
     ret = []
+    n_vars = []
     vars_ = {}
 
     for i, match in enumerate(matches):
         raw = replace(raw).replace(match, vars[i])
-        vars_[vars[i]] = match
+        
         if not '!' in match:
             match = sheet_name + '!' + match
+        vars_[vars[i]] = match
+        n_vars.append(vars[i])
         if ':' in match:
             match = match[:match.index(':')]
         ret.append(match)
 
-    return ret, raw, vars_
+    return ret, raw, vars_, n_vars
 
 def get_matches(t):
     done = set()

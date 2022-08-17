@@ -2,11 +2,6 @@ from openpyxl import load_workbook
 from graphlib import TopologicalSorter
 from dependencies import dependencies
 
-def formula(node, wb):
-    sheet, n = node.split('!')
-    sheet = sheet.replace("'", '')
-    return wb[sheet][n].value
-
 values_f = {}
 
 def build(nodes, wb):
@@ -15,8 +10,8 @@ def build(nodes, wb):
     while len(nodes) > 0:
         n = nodes.pop(0)
         if n not in ret:
-            deps, raw, vars = dependencies(n, wb)
-            values_f[n] = (raw, vars)
+            deps, raw, vars, n_vars = dependencies(n, wb)
+            values_f[n] = (raw, vars, n_vars)
             if deps is not None:
                 ret[n] = deps
                 nodes.extend(deps)
@@ -28,11 +23,8 @@ graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
 
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
-print(x)
-resultado = [(k, v) for (k, v) in values_f.items() if v[0] is not None]
-for k in resultado:
-    print(k)
-#x = [(i, formula(i, wb)) for i in x]
+#print(x)
 
-#for k in x:
-#    print(f';{k[0]};{k[1]}')
+for k in x:
+    print(f'{k};{values_f[k][0]};{values_f[k][1]};{values_f[k][2]}')
+    
