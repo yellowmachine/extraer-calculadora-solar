@@ -5,7 +5,7 @@ from dependencies import dependencies
 values_f = {}
 
 def _replace(txt):
-    txt = txt.replace("!", '-')
+    txt = txt.replace("!", '__')
     txt = txt.replace("ñ", 'ny')
     txt = txt.replace("Ñ", 'Ny')
     txt = txt.replace("á", 'a')
@@ -19,6 +19,8 @@ def _replace(txt):
     txt = txt.replace("Ó", 'O')
     txt = txt.replace("Ú", 'U')
     txt = txt.replace(" ", '_')
+
+    txt = txt.split(':')[0]
 
     return txt
 
@@ -52,5 +54,9 @@ x = tuple(ts.static_order())
 #print(x)
 
 for k in x:
-    print(f';{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
+    f = ''
+    if values_f[k][2] is not None:
+        f = replace(k) + " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + values_f[k][0][1:] + ")"
+        f = f + "(" + ",".join([ replace(values_f[k][1][a]) for a in values_f[k][2]]) + ")"
+    print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
     
