@@ -1,8 +1,13 @@
 from openpyxl import load_workbook
 from graphlib import TopologicalSorter
 from dependencies import dependencies
+from translate import translate
 
 values_f = {}
+
+def formula(n, wb):
+    sheet, r = n.split('!')
+    return wb[sheet][r].value
 
 def _replace(txt):
     txt = txt.replace("!", '__')
@@ -56,7 +61,11 @@ x = tuple(ts.static_order())
 for k in x:
     f = ''
     if values_f[k][2] is not None:
-        f = replace(k) + " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + values_f[k][0][1:] + ")"
+        f = replace(k) + " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + translate(values_f[k][0][1:]) + ")"
         f = f + "(" + ",".join([ replace(values_f[k][1][a]) for a in values_f[k][2]]) + ")"
     print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
     
+with open('schema.txt', 'w') as out:
+    for k in sorted(x):
+        out.write(f'{k};{formula(k, wb)}')
+        out.write('\n')

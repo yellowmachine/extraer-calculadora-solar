@@ -1,3 +1,4 @@
 venv
 .~lock.*
 *.xlsx
+__pycache__

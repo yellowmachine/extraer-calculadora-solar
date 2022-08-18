@@ -25,6 +25,7 @@ tokens = [
    'EQUAL',
    'ID',
    'SEMICOLON',
+   'COLON',
    'LESSTHAN',
    'LESSTHANEQUAL',
    'GREATERTHAN',
@@ -44,7 +45,7 @@ t_LBRACKET = r'\['
 t_RBRACKET = r'\]'
 #t_EQUAL   = r'='
 t_IF      = r'IF'
-#t_SEMICOLON = r';'
+t_COLON = r','
 t_LITERALSTRING = r'("[^"]*")'
 t_LESSTHAN = r'<'
 t_LESSTHANEQUAL = r'<='
@@ -94,8 +95,9 @@ def t_error(t):
     sys.exit()
 
 lexer = lex.lex()
+
 def translate(data):
-    skip_token = False
+    
     lexer.input(data)
     result = ""
     while True:
