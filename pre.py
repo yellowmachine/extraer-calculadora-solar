@@ -2,6 +2,7 @@ from openpyxl import load_workbook
 from graphlib import TopologicalSorter
 from dependencies import dependencies
 from translate import translate
+from input import inputs
 
 values_f = {}
 
@@ -52,11 +53,17 @@ def build(nodes, wb):
     return ret
 
 wb = load_workbook('Hoja simplificada calculo anual.xlsx')
-graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
+#graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
+graph = build(inputs, wb)
 
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
 #print(x)
+
+with open('schema.txt', 'w') as out:
+    for k in sorted(x):
+        out.write(f'{k};{formula(k, wb)}')
+        out.write('\n')
 
 for k in x:
     f = ''
@@ -65,7 +72,3 @@ for k in x:
         f = f + "(" + ",".join([ replace(values_f[k][1][a]) for a in values_f[k][2]]) + ")"
     print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
     
-with open('schema.txt', 'w') as out:
-    for k in sorted(x):
-        out.write(f'{k};{formula(k, wb)}')
-        out.write('\n')

@@ -1,5 +1,6 @@
 import re
 import string
+import sys
 
 patt = re.compile(r"('?[ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+'?!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
 vars = string.ascii_letters
@@ -13,6 +14,7 @@ def dependencies(node, wb):
     return dependencies_from_formula(f, sheet)
 
 def dependencies_from_formula(raw, sheet_name):
+    #print('--->', raw, sheet_name)
     matches = get_matches(raw)
     ret = []
     n_vars = []
@@ -20,9 +22,10 @@ def dependencies_from_formula(raw, sheet_name):
 
     for i, match in enumerate(matches):
         raw = replace(raw).replace(match, vars[i])
-        
+
         if not '!' in match:
             match = sheet_name + '!' + match
+        
         vars_[vars[i]] = match
         n_vars.append(vars[i])
         if ':' in match:
@@ -45,6 +48,9 @@ def get_matches(t):
             ret.append(chunk)
             done.add(chunk)
         i = x.end()
+    ret = [(len(x), x) for x in ret]
+    ret = sorted(ret, reverse=True)
+    ret = [x[1] for x in ret]
     return ret
 
 def replace(txt):
