@@ -3,6 +3,7 @@ from graphlib import TopologicalSorter
 from dependencies import dependencies
 from translate import translate
 from input import inputs
+from skip import skip
 
 values_f = {}
 
@@ -48,7 +49,7 @@ def build(nodes, wb):
             values_f[n] = (raw, vars, n_vars)
             if deps is not None:
                 ret[n] = deps
-                nodes.extend(deps)
+                nodes.extend([x for x in deps if x not in skip])
 
     return ret
 
@@ -65,10 +66,18 @@ with open('schema.txt', 'w') as out:
         out.write(f'{k};{formula(k, wb)}')
         out.write('\n')
 
+total_f = set()
+
 for k in x:
+    if k in skip:
+        continue
     f = ''
     if values_f[k][2] is not None:
+        xyz = " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + translate(values_f[k][0][1:]) + ")"
+        total_f.add(xyz)
         f = replace(k) + " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + translate(values_f[k][0][1:]) + ")"
         f = f + "(" + ",".join([ replace(values_f[k][1][a]) for a in values_f[k][2]]) + ")"
     print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
     
+print(total_f)
+print(len(total_f))
