@@ -2,3 +2,4 @@ venv
 .~lock.*
 *.xlsx
 __pycache__
+out2.csv

@@ -77,6 +77,3 @@ def get_matrixaddress(address_range):
         ret.append(inner)
 
     return ret
-
-x = build("X!A1:B2", "Y!A1")
-print(x)

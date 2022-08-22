@@ -49,17 +49,16 @@ def build(nodes, wb):
             values_f[n] = (raw, vars, n_vars)
             if deps is not None:
                 ret[n] = deps
-                nodes.extend([x for x in deps if x not in skip])
+                nodes.extend([x for x in deps if not skip(x)])
 
     return ret
 
 wb = load_workbook('Hoja simplificada calculo anual.xlsx')
-#graph = build(['RESULTADOS ANÁLISIS CONSUMO!B21'], wb)
 graph = build(inputs, wb)
+#graph = build(["CALCULOS!T8020"], wb)
 
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
-#print(x)
 
 with open('schema.txt', 'w') as out:
     for k in sorted(x):
@@ -68,16 +67,43 @@ with open('schema.txt', 'w') as out:
 
 total_f = set()
 
+funcs_set = []
+funcs_partial_set = []
+funcs_dict = {}
+count_f = 0
+
 for k in x:
-    if k in skip:
+    if skip(k):
         continue
     f = ''
+    _f = None
     if values_f[k][2] is not None:
         xyz = " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + translate(values_f[k][0][1:]) + ")"
         total_f.add(xyz)
         f = replace(k) + " = np.vectorize( lambda " + ",".join(values_f[k][2]) + " : " + translate(values_f[k][0][1:]) + ")"
         f = f + "(" + ",".join([ replace(values_f[k][1][a]) for a in values_f[k][2]]) + ")"
-    print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
+        _f = "return " + translate(values_f[k][0][1:])
+        if _f not in funcs_partial_set:
+            if "MAX" in f or "MIN" in f or "AVERAGE" in f or "SUM" in f or "SUMIF" in f or "SUMIFS" in f:
+                _f2 = f'def f_{count_f}({",".join(values_f[k][2])}):' + "\n    " + _f
+            else:
+                _f2 = "@np.vectorize\n" + f'def f_{count_f}({",".join(values_f[k][2])}):' + "\n    " + _f
+            funcs_partial_set.append(_f)
+            count_f += 1
+            funcs_set.append(_f2)
+            funcs_dict[_f] = count_f
+        
+    #print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
+    if _f is None:
+        c = k
+    else:
+        c = str(funcs_dict[_f])
+    print(f'{"f_" + c};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]};{values_f[k][1]}')
     
-print(total_f)
+#for f in total_f:
+#    print(f)
+
+for f in funcs_set:
+    print(f + "\n")
+
 print(len(total_f))
