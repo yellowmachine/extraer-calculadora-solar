@@ -1,6 +1,7 @@
 import re
 import string
 import sys
+from build_ranges import get_matrixaddress
 
 patt = re.compile(r"('?[ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+'?!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
 vars = string.ascii_letters
@@ -14,7 +15,6 @@ def dependencies(node, wb):
     return dependencies_from_formula(f, sheet)
 
 def dependencies_from_formula(raw, sheet_name):
-    #print('--->', raw, sheet_name)
     matches = get_matches(raw)
     ret = []
     n_vars = []
@@ -29,6 +29,10 @@ def dependencies_from_formula(raw, sheet_name):
         vars_[vars[i]] = match
         n_vars.append(vars[i])
         if ':' in match:
+            mx = get_matrixaddress(match)
+            x = len(mx)
+            y = len(mx[0])
+            print(f'{match};{x};{y}')            
             match = match[:match.index(':')]
         ret.append(match)
 

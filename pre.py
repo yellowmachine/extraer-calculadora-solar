@@ -7,6 +7,8 @@ from skip import skip
 
 values_f = {}
 
+raw_cell = {}
+
 def formula(n, wb):
     sheet, r = n.split('!')
     return wb[sheet][r].value
@@ -55,7 +57,6 @@ def build(nodes, wb):
 
 wb = load_workbook('Hoja simplificada calculo anual.xlsx')
 graph = build(inputs, wb)
-#graph = build(["CALCULOS!T8020"], wb)
 
 ts = TopologicalSorter(graph)
 x = tuple(ts.static_order())
@@ -93,12 +94,13 @@ for k in x:
             funcs_set.append(_f2)
             funcs_dict[_f] = count_f
         
-    #print(f'{f};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]}')
     if _f is None:
-        c = k
+        c = replace(k)
     else:
         c = str(funcs_dict[_f])
-    print(f'{"f_" + c};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]};{values_f[k][1]}')
+    s, r = k.split('!')
+    r = r.split(':')[0]
+    print(f'{"f_" + c};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]};{values_f[k][1]};{k}{wb[s][r].value}')
     
 #for f in total_f:
 #    print(f)
