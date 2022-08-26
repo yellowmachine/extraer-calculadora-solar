@@ -6,15 +6,15 @@ from build_ranges import get_matrixaddress
 patt = re.compile(r"('?[ñÑa-zÁÉÍÓÚáéíóúA-Z0-9\s]+'?!)?(\$?[A-Z]{1,3}\$?[0-9]{1,7})(:\$?[A-Z]{1,3}\$?[0-9]{1,7})?")
 vars = string.ascii_letters
 
-def dependencies(node, wb):
+def dependencies(node, wb, dimensions):
     sheet, n = node.split('!')
     f = wb[sheet][n].value
     f = str(f)
     if not f.startswith('='):
         return None, f, None, None
-    return dependencies_from_formula(f, sheet)
+    return dependencies_from_formula(f, sheet, dimensions)
 
-def dependencies_from_formula(raw, sheet_name):
+def dependencies_from_formula(raw, sheet_name, dimensions):
     matches = get_matches(raw)
     ret = []
     n_vars = []
@@ -31,9 +31,10 @@ def dependencies_from_formula(raw, sheet_name):
         if ':' in match:
             mx = get_matrixaddress(match)
             x = len(mx)
-            y = len(mx[0])
+            y = len(mx[0])            
             print(f'{match};{x};{y}')            
             match = match[:match.index(':')]
+            dimensions[match] = (x, y)
         ret.append(match)
 
     return ret, raw, vars_, n_vars

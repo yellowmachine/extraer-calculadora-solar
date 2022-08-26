@@ -9,6 +9,8 @@ values_f = {}
 
 raw_cell = {}
 
+dimensions = {}
+
 def formula(n, wb):
     sheet, r = n.split('!')
     return wb[sheet][r].value
@@ -47,7 +49,7 @@ def build(nodes, wb):
     while len(nodes) > 0:
         n = nodes.pop(0)
         if n not in ret:
-            deps, raw, vars, n_vars = dependencies(n, wb)
+            deps, raw, vars, n_vars = dependencies(n, wb, dimensions)
             values_f[n] = (raw, vars, n_vars)
             if deps is not None:
                 ret[n] = deps
@@ -101,7 +103,7 @@ for k in x:
     s, r = k.split('!')
     r = r.split(':')[0]
     print(f'{"f_" + c};{replace(k)};{values_f[k][0]};{replace(values_f[k][1])};{values_f[k][2]};{values_f[k][1]};{k}{wb[s][r].value}')
-    
+        
 #for f in total_f:
 #    print(f)
 
@@ -109,3 +111,14 @@ for f in funcs_set:
     print(f + "\n")
 
 print(len(total_f))
+
+for k in graph:
+    dim = []
+    for x in graph[k]:
+        try:
+            dim.append(dimensions[x])
+        except:
+            dim.append(x + ":?")
+    print(k, dim)
+
+#print(dimensions)
