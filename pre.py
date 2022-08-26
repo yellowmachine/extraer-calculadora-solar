@@ -68,6 +68,15 @@ with open('schema.txt', 'w') as out:
         out.write(f'{k};{formula(k, wb)}')
         out.write('\n')
 
+with open('schema_topo.csv', 'w') as out:
+    for k in x:
+        f = str(formula(k, wb))
+        if "MAX(" in f or "MIN(" in f or "AVERAGE(" in f or "SUM(" in f or "SUMIF(" in f or "SUMIFS(" in f:
+            out.write(f'{k};{f};*')
+        else:
+            out.write(f'{k};{f}')
+        out.write('\n')
+
 total_f = set()
 
 funcs_set = []
