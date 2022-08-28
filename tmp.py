@@ -1,3 +1,4 @@
+"""
 structure = {}
 
 for line in open("schema_with_types.csv.old"):
@@ -18,3 +19,11 @@ for line in open('schema_topo.csv'):
         print(structure[k] + ';' + line)
     else:
         print(line)
+"""
+
+c = set()
+for line in open("schema_with_types_v2.csv"):
+    fields = line.split(";")
+    c.add(fields[0])
+
+print(c)
