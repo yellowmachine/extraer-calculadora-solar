@@ -1,6 +1,6 @@
 structure = {}
 
-for line in open("schema_with_types.csv"):
+for line in open("schema_with_types.csv.old"):
     if line.endswith(';*\n'):
         line = line[:-3]
     campos = line.split(";")
