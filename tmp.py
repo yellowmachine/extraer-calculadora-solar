@@ -26,4 +26,4 @@ for line in open("schema_with_types_v2.csv"):
     fields = line.split(";")
     c.add(fields[0])
 
-print(c)
+print(sorted(c))
